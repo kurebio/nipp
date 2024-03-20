@@ -3,16 +3,27 @@
 </template>
 
 <script lang="ts">
-import * as monacoEditor from 'monaco-editor';
-import {defineComponent, onBeforeUnmount, onMounted, type PropType, ref, toRefs, watch} from 'vue';
+import * as monacoEditor from "monaco-editor";
+const { initVimMode } = require("monaco-vim");
+import {
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  type PropType,
+  ref,
+  toRefs,
+  watch,
+} from "vue";
 
 export default defineComponent({
   props: {
     modelValue: { type: String, required: true },
-    options: { type: Object as PropType<monacoEditor.editor.IStandaloneEditorConstructionOptions> },
+    options: {
+      type: Object as PropType<monacoEditor.editor.IStandaloneEditorConstructionOptions>,
+    },
   },
   emits: {
-    'update:modelValue'(value: string) {}
+    "update:modelValue"(value: string) {},
   },
   setup(props, context) {
     const rootRef = ref<HTMLDivElement>();
@@ -21,9 +32,10 @@ export default defineComponent({
 
     onMounted(() => {
       editor = monacoEditor.editor.create(rootRef.value!, props.options);
+      initVimMode(editor);
       editor.setValue(props.modelValue);
       editor.onKeyUp(() => {
-        context.emit('update:modelValue', editor!.getValue());
+        context.emit("update:modelValue", editor!.getValue());
       });
     });
 
@@ -46,8 +58,11 @@ export default defineComponent({
         return;
       }
       editor.updateOptions(newOptions);
-      if (newOptions.language === undefined || newOptions.language === oldOptions?.language) {
-       return;
+      if (
+        newOptions.language === undefined ||
+        newOptions.language === oldOptions?.language
+      ) {
+        return;
       }
       const editorModel = editor.getModel();
       if (editorModel === null) {
@@ -58,7 +73,7 @@ export default defineComponent({
 
     return {
       rootRef,
-    }
-  }
+    };
+  },
 });
 </script>
